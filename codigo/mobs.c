@@ -1,5 +1,4 @@
 #include "mobs.h"
-#include "mapa.h"
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -11,6 +10,8 @@ void init_mob(Mob *mob, int x, int y, char tipo, int warning) {
     mob->tipo = tipo;
     mob->warning = warning;
 }
+// ainda falta utilizar o warning na update_mobs_cobarde
+//----------------------------------------------------------------------------------------------------------------------
 
 void mover_mob_aleatoriamente(Mapa* mapa, Mob* mob)
 {
@@ -58,19 +59,19 @@ void mover_mob_aleatoriamente(Mapa* mapa, Mob* mob)
 
 void foge (Mapa *mapa, Mob *mob, Personagem *personagem)
 {
-    int x_diff = mob1->x - avgX;
-    int y_diff = mob1->y - avgY;
+    int x_diff = mob->x - personagem -> x;
+    int y_diff = mob->y - personagem -> y;
     if (abs(x_diff) > abs(y_diff)) { // Movimento no eixo X
-        if (x_diff > 0 && mapa->cells[mob1->y][mob1->x - 1].tile.default_tile.walkable) {
-            mob1->x++;
-        } else if (x_diff < 0 && mapa->cells[mob1->y][mob1->x + 1].tile.default_tile.walkable) {
-            mob1->x--;
+        if (x_diff > 0 && mapa->cells[mob->y][mob->x - 1].tile.default_tile.walkable) {
+            mob->x++;
+        } else if (x_diff < 0 && mapa->cells[mob->y][mob->x + 1].tile.default_tile.walkable) {
+            mob->x--;
         }
     } else { // Movimento no eixo Y
-        if (y_diff > 0 && mapa->cells[mob1->y - 1][mob1->x].tile.default_tile.walkable) {
-            mob1->y++;
-        } else if (y_diff < 0 && mapa->cells[mob1->y + 1][mob1->x].tile.default_tile.walkable) {
-            mob1->y--;
+        if (y_diff > 0 && mapa->cells[mob->y - 1][mob->x].tile.default_tile.walkable) {
+            mob->y++;
+        } else if (y_diff < 0 && mapa->cells[mob->y + 1][mob->x].tile.default_tile.walkable) {
+            mob->y--;
         }
     }
 }
@@ -320,7 +321,6 @@ void update_mob_esperta(mapa, mob, personagem)
     
 }
 
-
 int update_mob_estupida(Mapa* mapa, Mob* mob, Personagem* personagem) { // função que calcula para onde o mob se moverá e retorna o ponto médio entre o jogador e o mob
     int x_diff = personagem->x - mob->x;
     int y_diff = personagem->y - mob->y;
@@ -381,262 +381,3 @@ void update_mobs(Mapa* mapa, Personagem *personagem) { // função que atualiza 
     }
 }
 
-
-int aproximar(Mapa* mapa, Mob* mob, Mob* mob_p) { // função que junta o mob ao mob mais próximo e devolve o inteiro do ponto médio entre eles. Imaginamos que os mobs se estão a aproxma do ponto 2 3, a função retorna o inteiro 23
-    int x_diff = mob->x - mob_p->x;
-    int new_x = mob-> x;
-    int y_diff = mob->y - mob_p->y;
-    int new_y = mob -> y;
-    if (abs(x_diff) > abs(y_diff)) { // Movimento no eixo X
-        if (x_diff > 0 && mapa->cells[mob->y][mob->x - 1].tile.default_tile.walkable) {
-            new_x--;
-        } else if (x_diff < 0 && mapa->cells[mob->y][mob->x + 1].tile.default_tile.walkable) {
-            new_x++;
-        }
-    } else { // Movimento no eixo Y
-        if (y_diff > 0 && mapa->cells[mob->y - 1][mob->x].tile.default_tile.walkable) {
-            new_y--;
-        } else if (y_diff < 0 && mapa->cells[mob->y + 1][mob->x].tile.default_tile.walkable) {
-            new_y++;
-        }
-    }
-
-    // Movimento do segundo mob em direção ao primeiro
-    x_diff = mob_p->x - mob->x;
-    int new_x_x = mob_p->x;
-    y_diff = mob_p->y - mob->y;
-    int new_y_y = mob->y;
-    if (abs(x_diff) > abs(y_diff)) { // Movimento no eixo X
-        if (x_diff > 0 && mapa->cells[mob_p->y][mob_p->x - 1].tile.default_tile.walkable) {
-            new_x_x--;
-        } else if (x_diff < 0 && mapa->cells[mob_p->y][mob_p->x + 1].tile.default_tile.walkable) {
-            new_x_x++;
-        }
-    } else { // Movimento no eixo Y
-        if (y_diff > 0 && mapa->cells[mob_p->y - 1][mob_p->x].tile.default_tile.walkable) {
-            new_y_y--;
-        } else if (y_diff < 0 && mapa->cells[mob_p->y + 1][mob_p->x].tile.default_tile.walkable) {
-            new_y_y++;
-        }
-    }
-
-    // Construção do inteiro com as coordenadas do ponto de aproximação
-    int x = (new_x + new_x_x) % 10; // Obter o dígito das unidades do X
-    int y = (new_y + new_y_y) % 10; // Obter o dígito das unidades do Y
-    int xy = x * 10 + y; // Combinar os dígitos em um número inteiro
-
-    return xy;
-}
-
-
-void aproximar_mob_proximo(Mapa* mapa, Mob* mob) {
-    int raio = 5;
-    int x_min = max(0, mob->x - raio);
-    int x_max = min(MAX_LARGURA - 1, mob->x + raio);
-    int y_min = max(0, mob->y - raio);
-    int y_max = min(MAX_ALTURA - 1, mob->y + raio);
-
-    Mob* mob_proximo = NULL;
-    int distancia_proximo = INT_MAX;
-
-    for (int y = y_min; y <= y_max; y++) {
-        for (int x = x_min; x <= x_max; x++) {
-            MapCell* celula = &mapa->cells[y][x];
-            if (celula->type == TILE_DEFAULT || celula->type == TILE_PAREDE || celula->type == TILE_ESCADA) {
-                continue;
-            }
-            Mob* outro_mob = (Mob*) celula->tile.default_tile.walkable;
-            if (outro_mob == NULL || outro_mob == mob) {
-                continue;
-            }
-            int distancia_x = abs(mob->x - outro_mob->x);
-            int distancia_y = abs(mob->y - outro_mob->y);
-            int distancia = distancia_x + distancia_y;
-            if (distancia <= raio && distancia < distancia_proximo) {
-                distancia_proximo = distancia;
-                mob_proximo = outro_mob;
-            }
-        }
-    }
-
-    if (mob_proximo != NULL) {
-        aproximar(mapa, mob, mob_proximo);
-    }
-}
-
-
-void grita(Mapa* mapa, Mob* mob) { // função que avisa na vizinhança do mob que p player está na vizinhança do mob em questão
-    int raio = 5;
-    int x_min = fmax(mob->x - raio, 0);
-    int y_min = fmax(mob->y - raio, 0);
-    int x_max = fmin(mob->x + raio, MAX_LARGURA - 1);
-    int y_max = fmin(mob->y + raio, MAX_ALTURA - 1);
-    
-    for (int y = y_min; y <= y_max; y++) {
-        for (int x = x_min; x <= x_max; x++) {
-            MapCell* celula = &mapa->cells[y][x];
-            if (celula->type == TILE_DEFAULT) {
-                continue;
-            }
-            if (celula->type == TILE_PAREDE) {
-                continue;
-            }
-            if (celula->type == TILE_ESCADA) {
-                continue;
-            }
-            if (celula->tile.default_tile.walkable == NULL) {
-                continue;
-            }
-            Mob* outro_mob = (Mob*) celula->tile.default_tile.walkable;
-            if (outro_mob == NULL || outro_mob == mob) {
-                continue;
-            }
-            int distancia_x = abs(mob->x - outro_mob->x);
-            int distancia_y = abs(mob->y - outro_mob->y);
-            if (distancia_x <= raio && distancia_y <= raio) {
-                outro_mob->warning = 1;
-            }
-        }
-    }
-}
-
-
-bool localiza_jogador_raio(Mapa* mapa, Mob* mob) {
-    int raio = 5;
-    int x_min = fmax(mob->x - raio, 0);
-    int y_min = fmax(mob->y - raio, 0);
-    int x_max = fmin(mob->x + raio, MAX_LARGURA - 1);
-    int y_max = fmin(mob->y + raio, MAX_ALTURA - 1);
-    
-    for (int y = y_min; y <= y_max; y++) {
-        for (int x = x_min; x <= x_max; x++) {
-            MapCell* celula = &mapa->cells[y][x];
-            if (celula->type == TILE_DEFAULT) {
-                continue;
-            }
-            if (celula->type == TILE_PAREDE) {
-                continue;
-            }
-            if (celula->type == TILE_ESCADA) {
-                continue;
-            }
-            if (celula->tile.default_tile.walkable != NULL) {
-                continue;
-            }
-            if (x == mob->x && y == mob->y) {
-                continue;
-            }
-            if (celula->tile.default_tile.walkable == NULL && celula->tile.default_tile.tile == '@') {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool localizar_mobs_raio(Mapa* mapa, Mob* mob) { // função que localiza os mobs dentro do raio/visão
-    int raio = 5;
-    int x_min = max(0, mob->x - raio);
-    int x_max = min(MAX_LARGURA - 1, mob->x + raio);
-    int y_min = max(0, mob->y - raio);
-    int y_max = min(MAX_ALTURA - 1, mob->y + raio);
-
-    for (int y = y_min; y <= y_max; y++) {
-        for (int x = x_min; x <= x_max; x++) {
-            MapCell* celula = &mapa->cells[y][x];
-            if (celula->type == TILE_DEFAULT) {
-                continue;
-            }
-            if (celula->type == TILE_PAREDE) {
-                continue;
-            }
-            if (celula->type == TILE_ESCADA) {
-                continue;
-            }
-            Mob* outro_mob = (Mob*) celula->tile.default_tile.walkable;
-            if (outro_mob == NULL || outro_mob == mob) {
-                continue;
-            }
-            int distancia_x = abs(mob->x - outro_mob->x);
-            int distancia_y = abs(mob->y - outro_mob->y);
-            if (distancia_x <= raio && distancia_y <= raio) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-void update_mob_estupido(Mapa* mapa, Mob* mob, Personagem* personagem) {
-    int target = update_mob_estupida(mapa, mob, personagem);
-    int target_x = target / 10;
-    int target_y = target % 10;
-    
-    if (target_x != mob->x || target_y != mob->y) {
-        mob->x = target_x;
-        mob->y = target_y;
-    }
-}
-
-
-int update_mob_estupida(Mapa* mapa, Mob* mob, Personagem* personagem) { // função que calcula para onde o mob se moverá e retorna o ponto médio entre o jogador e o mob
-    int x_diff = personagem->x - mob->x;
-    int y_diff = personagem->y - mob->y;
-    int new_x = mob -> x;
-    int new_y = mob -> y;
-    if (abs(x_diff) > abs(y_diff)) { // Movimento no eixo X
-        if (x_diff > 0 && mapa->cells[mob->y][mob->x + 1].tile.default_tile.walkable) {
-            new_x++;
-        } else if (x_diff < 0 && mapa->cells[mob->y][mob->x - 1].tile.default_tile.walkable) {
-            new_x--;
-        }
-    } else { // Movimento no eixo Y
-        if (y_diff > 0 && mapa->cells[mob->y + 1][mob->x].tile.default_tile.walkable) {
-            new_y++;
-        } else if (y_diff < 0 && mapa->cells[mob->y - 1][mob->x].tile.default_tile.walkable) {
-            new_y--;
-        }
-    }
-    
-    int target = 0;
-    if (new_x == personagem->x || new_y == personagem->y) {
-        target = mob->x * 10 + mob->y;
-    }
-    return target;
-}
-
-
-void update_mobs(Mapa* mapa, Personagem *personagem) { // função que atualiza todos os mobs no mapa
-    for (int y = 0; y < MAX_ALTURA; y++) {
-        for (int x = 0; x < MAX_LARGURA; x++) {
-            MapCell* celula = &mapa->cells[y][x];
-            if (celula->type == TILE_DEFAULT) {
-                continue;
-            }
-            if (celula->type == TILE_PAREDE) {
-                continue;
-            }
-            if (celula->type == TILE_ESCADA) {
-                continue;
-            }
-            Mob* mob = (Mob*) celula->tile.default_tile.walkable;
-            if (mob == NULL) {
-                continue;
-            }
-            switch (mob->tipo) {
-                case 'E':
-                    update_mob_estupida(mob, mapa, personagem);
-                    break;
-                case 'C':
-                    update_mob_cobarde(mob, mapa, personagem);
-                    break;
-                case 'P':
-                    update_mob_esperta(mob, mapa, personagem);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-}

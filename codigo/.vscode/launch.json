@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/rui/Desktop/LI2/LI2/LI2-main/codigo",
-      "program": "/home/rui/Desktop/LI2/LI2/LI2-main/codigo/build/Debug/outDebug",
+      "cwd": "/home/rui/Desktop/LI2/LI2-main/codigo",
+      "program": "/home/rui/Desktop/LI2/LI2-main/codigo/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

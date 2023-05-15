@@ -1,5 +1,4 @@
 #include "input.h"
-#include "combate.h"
 #include <ncurses.h>
 #include <stdlib.h>
 

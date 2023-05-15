@@ -1,8 +1,11 @@
 #ifndef MAPA_H
 #define MAPA_H
 
+#include "personagem.h"
+
 #define MAX_LARGURA 80
 #define MAX_ALTURA 24
+
 
 typedef enum {
     TILE_DEFAULT,

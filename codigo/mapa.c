@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include "mapa.h"
-#include "personagem.h"
 #include <stdbool.h>
 
 bool local_escada_possivel(Mapa *mapa,int linha, int coluna, int direcao);

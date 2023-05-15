@@ -1,5 +1,4 @@
 #include "personagem.h"
-#include "mapa.h"
 
 void usarEscada(Mapa *m, MapTileEscada escada, Personagem *personagem, int x, int y);
 

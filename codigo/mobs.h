@@ -16,9 +16,8 @@ typedef struct {
 
 void init_mob(Mob *mob, int x, int y, char tipo, int warning);
 void update_mobs(Mapa *mapa, Personagem *personagem);
-int update_mob_estupido(Mapa *mapa, Mob *mob, Personagem *personagem);
 bool localizar_mobs_raio(Mapa* mapa, Mob* mob);
-bool localiza_jogador_raio(Mapa* mapa, Mob* mob);
+bool localiza_jogador_raio(Mapa* mapa, Mob* mob, Personagem *personagem);
 void update_mob_covarde(Mapa* mapa, Mob* mob);
 void grita(Mapa* mapa, Mob* mob);
 Mob* aproximar_mob_proximo(Mapa* mapa, Mob* mob);
